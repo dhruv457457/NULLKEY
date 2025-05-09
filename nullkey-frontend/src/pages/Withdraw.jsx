@@ -1,55 +1,73 @@
 import { useState } from "react";
+import { useStarknet } from "../context/StarknetContext";
 
 const Withdraw = () => {
-  const [loading, setLoading] = useState(false);
+  const { contract, isConnected } = useStarknet();
+  const [txHash, setTxHash] = useState(null);
   const [status, setStatus] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleWithdraw = async () => {
-    setLoading(true);
-    setStatus(null);
+    if (!isConnected || !contract) {
+      setStatus({ type: "error", message: "Connect your wallet first." });
+      return;
+    }
 
     try {
-      // 👉 Replace this with real Starknet invoke
-      console.log("Calling withdraw()...");
+      setLoading(true);
+      setStatus(null);
 
-      // Simulate success after 1s
-      setTimeout(() => {
-        setStatus({ success: true });
-        setLoading(false);
-      }, 1000);
+      const tx = await contract.withdraw();
+      setTxHash(tx.transaction_hash);
+      setStatus({ type: "success", message: "Withdraw successful!" });
     } catch (err) {
-      console.error(err);
-      setStatus({ success: false });
+      console.error("Withdraw failed:", err);
+      setStatus({
+        type: "error",
+        message: err.message || "Withdraw failed. Make sure the asset is unlocked.",
+      });
+    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-xl mx-auto backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-6 shadow-md">
-      <h2 className="text-2xl font-semibold mb-4 text-white">🎁 Withdraw NFT</h2>
+    <div className="max-w-xl mx-auto text-white p-4 bg-white/5 rounded-lg backdrop-blur-md border border-white/10">
+      <h2 className="text-2xl font-semibold mb-4">💸 Withdraw Asset</h2>
 
-      <p className="text-gray-300 mb-6">
-        If your locker is unlocked, you can now withdraw your NFT securely back to your wallet.
+      <p className="mb-4 text-sm text-white/80">
+        This will attempt to withdraw your locked asset. It only works if the asset is already unlocked by a valid proof or guardian vote.
       </p>
 
       <button
         onClick={handleWithdraw}
         disabled={loading}
-        className="w-full py-2 bg-pink-600 hover:bg-pink-700 rounded-md text-white font-semibold transition"
+        className={`w-full px-4 py-2 rounded-md text-white text-sm font-medium shadow transition ${
+          loading ? "bg-pink-400" : "bg-pink-600 hover:bg-pink-700"
+        }`}
       >
-        {loading ? "Processing..." : "Withdraw"}
+        {loading ? "Withdrawing..." : "Withdraw Now"}
       </button>
 
       {status && (
-        <div
-          className={`mt-4 text-sm font-medium ${
-            status.success ? "text-green-400" : "text-red-400"
+        <p
+          className={`mt-4 text-sm ${
+            status.type === "success" ? "text-green-400" : "text-red-400"
           }`}
         >
-          {status.success
-            ? "✅ NFT successfully withdrawn!"
-            : "❌ Withdrawal failed. Please try again."}
-        </div>
+          {status.message}
+        </p>
+      )}
+
+      {txHash && (
+        <a
+          href={`https://sepolia.starkscan.co/tx/${txHash}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-400 underline mt-2 block text-sm"
+        >
+          View transaction on StarkScan ↗
+        </a>
       )}
     </div>
   );

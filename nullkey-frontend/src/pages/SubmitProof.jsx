@@ -1,58 +1,68 @@
 import { useState } from "react";
+import { useStarknet } from "../context/StarknetContext";
 
 const SubmitProof = () => {
-  const [proofInput, setProofInput] = useState("");
+  const { contract, isConnected } = useStarknet();
+  const [proof, setProof] = useState("");
+  const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
 
-  const handleSubmitProof = async () => {
-    setLoading(true);
-    setResult(null);
+  const handleSubmit = async () => {
+    if (!isConnected || !contract) {
+      setStatus({ type: "error", message: "Connect your wallet first." });
+      return;
+    }
+
+    if (!proof.trim()) {
+      setStatus({ type: "error", message: "Please enter a valid proof." });
+      return;
+    }
 
     try {
-      // 👉 Replace with real Starknet invoke later
-      console.log("Submitting proof:", proofInput);
+      setLoading(true);
+      setStatus(null);
 
-      // Simulated async call (fake success if proof === "dhruv123")
-      setTimeout(() => {
-        if (proofInput === "dhruv123") {
-          setResult({ success: true });
-        } else {
-          setResult({ success: false });
-        }
-        setLoading(false);
-      }, 1000);
+      const tx = await contract.submit_proof(proof);
+      setStatus({
+        type: "success",
+        message: `Proof submitted! Tx hash: ${tx.transaction_hash}`,
+      });
     } catch (err) {
-      console.error(err);
-      setResult({ success: false });
+      console.error("Submit failed:", err);
+      setStatus({ type: "error", message: err.message || "Submit failed." });
+    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-xl mx-auto backdrop-blur-md bg-white/10 border border-white/20 rounded-xl p-6 shadow-md">
-      <h2 className="text-2xl font-semibold mb-4 text-white">🔐 Submit Proof</h2>
+    <div className="text-white max-w-xl mx-auto p-4 bg-white/5 backdrop-blur-md rounded-lg border border-white/10">
+      <h2 className="text-2xl font-semibold mb-4">🔐 Submit Ownership Proof</h2>
 
       <input
         type="text"
-        value={proofInput}
-        onChange={(e) => setProofInput(e.target.value)}
-        placeholder="Enter your recovery secret..."
-        className="w-full p-3 rounded-md bg-white/5 border border-white/20 text-white placeholder-gray-300 mb-4"
+        placeholder="Enter your secret proof (felt252 hash)"
+        value={proof}
+        onChange={(e) => setProof(e.target.value)}
+        className="w-full px-4 py-2 rounded-md bg-white/10 border border-white/20 text-white placeholder-white/50 mb-4"
       />
 
       <button
-        onClick={handleSubmitProof}
-        disabled={loading || !proofInput}
-        className="w-full py-2 bg-pink-600 hover:bg-pink-700 rounded-md text-white font-semibold transition"
+        onClick={handleSubmit}
+        disabled={loading}
+        className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-md shadow-md transition w-full"
       >
         {loading ? "Submitting..." : "Submit Proof"}
       </button>
 
-      {result && (
-        <div className={`mt-4 text-sm font-medium ${result.success ? "text-green-400" : "text-red-400"}`}>
-          {result.success ? "✅ Proof accepted. NFT is now unlocked!" : "❌ Invalid proof. Try again."}
-        </div>
+      {status && (
+        <p
+          className={`mt-4 text-sm ${
+            status.type === "success" ? "text-green-400" : "text-red-400"
+          }`}
+        >
+          {status.message}
+        </p>
       )}
     </div>
   );

@@ -1,7 +1,10 @@
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import WalletConnect from "./WalletConnect";
 
 const Navbar = () => {
   const { pathname } = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -11,33 +14,62 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="w-full px-6 py-4 backdrop-blur-md bg-white/10 border-b border-white/10 shadow-sm sticky top-0 z-50">
-      <div className="max-w-6xl mx-auto flex justify-between items-center">
+    <nav className="w-full backdrop-blur-md bg-white/10 border-b border-white/10 shadow-sm sticky top-0 z-50">
+      <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-4">
         {/* Logo */}
         <Link to="/" className="text-2xl font-bold tracking-wide text-white">
           🔐 NullKey
         </Link>
 
-        {/* Nav Links */}
-        <div className="flex items-center gap-6">
+        {/* Desktop Links */}
+        <div className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => (
             <Link
               key={link.name}
               to={link.path}
-              className={`text-sm font-medium hover:text-pink-300 transition ${
-                pathname === link.path ? "text-pink-400 underline" : "text-white"
+              className={`text-sm font-medium transition ${
+                pathname === link.path ? "text-pink-400 underline" : "text-white hover:text-pink-300"
               }`}
             >
               {link.name}
             </Link>
           ))}
+          <WalletConnect />
+        </div>
 
-          {/* Placeholder for Wallet Connect */}
-          <button className="ml-4 px-4 py-1.5 bg-pink-600 hover:bg-pink-700 text-sm rounded-md shadow-md transition">
-            Connect Wallet
+        {/* Mobile menu button */}
+        <div className="md:hidden">
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="text-white text-2xl"
+          >
+            {menuOpen ? "✕" : "☰"}
           </button>
         </div>
       </div>
+
+      {/* Mobile menu */}
+      {menuOpen && (
+        <div className="md:hidden bg-[#2c0a11] px-4 pb-4 flex flex-col gap-3">
+          {navLinks.map((link) => (
+            <Link
+              key={link.name}
+              to={link.path}
+              onClick={() => setMenuOpen(false)}
+              className={`text-sm font-medium transition ${
+                pathname === link.path
+                  ? "text-pink-400 underline"
+                  : "text-white hover:text-pink-300"
+              }`}
+            >
+              {link.name}
+            </Link>
+          ))}
+          <div className="mt-2">
+            <WalletConnect />
+          </div>
+        </div>
+      )}
     </nav>
   );
 };
