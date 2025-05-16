@@ -3,3 +3,27 @@ target
 snfoundry_trace/
 coverage/
 profile/
+/.starknet_foundry_accounts account deploy \
+>   --url https://starknet-sepolia.public.blastapi.io/rpc/v0_8 \
+>   --name nullkey1
+command: account deploy
+transaction_hash: 0x0134e9d1d22841d86b1af28ee4c549f675be9a82ce7e89d9c7173c699b73e049
+
+To see invocation details, visit:
+transaction: https://sepolia.starkscan.co/tx/0x0134e9d1d22841d86b1af28ee4c549f675be9a82ce7e89d9c7173c699b73e049
+
+
+address: 0x04d290da3e0866a474d4ac7beacb9d9a2ae26176f8ecbe0e1c0f80ea2c2f9deb  ===
+
+class_hash: 0x03063077591c514f2d7b254ef2f2bd9fb61b83b35bdbe6ec6b94f93f0f21440a
+transaction_hash: 0x035a0ec33ddef54a66ea17d9a1fdffb95e96e57cede380ca7561999da443a885
+mine@DESKTOP-1PK0M5Q:/mnt/c/Users/mine/Documents/GitHub/NULLKEY/locker_project$ sncast --account nullkey1 deploy \
+>   --class-hash 0x03063077591c514f2d7b254ef2f2bd9fb61b83b35bdbe6ec6b94f93f0f21440a \
+>   --url https://starknet-sepolia.public.blastapi.io/rpc/v0_8
+command: deploy
+contract_address: 0x07538f0e5549eb9a8626fa77a018d7691c26c9600d28fb7fb273abf7ffceabcc
+transaction_hash: 0x03a0d8e05f4af171a63ed8e46ef062d3be2f1bb0c3e349d83266f4448f8207c2
+
+To see deployment details, visit:
+contract: https://sepolia.starkscan.co/contract/0x07538f0e5549eb9a8626fa77a018d7691c26c9600d28fb7fb273abf7ffceabcc
+transaction: https://sepolia.starkscan.co/tx/0x03a0d8e05f4af171a63ed8e46ef062d3be2f1bb0c3e349d83266f4448f8207c2
