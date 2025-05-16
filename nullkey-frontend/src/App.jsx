@@ -1,34 +1,30 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { StarknetProvider } from "./context/StarknetContext";
-import Navbar from "./components/Navbar";
+// ❌ Remove this line
+// import { BrowserRouter as Router } from "react-router-dom";
 
-// Pages
-import Home from "./pages/Home";
-import LockInfo from "./pages/LockInfo";
-import SubmitProof from "./pages/SubmitProof";
-import Withdraw from "./pages/Withdraw";
+// ✅ Just keep Routes and Route
+import { Routes, Route } from 'react-router-dom';
+import { StarknetProvider } from './context/StarknetContext';
+import Home from './pages/Home';
+import LockAsset from './pages/LockAsset';
+import Dashboard from './pages/Dashboard';
+import NotFound from './pages/NotFound';
+import Navbar from './components/Navbar';
 
 function App() {
   return (
-    <Router>
-      <StarknetProvider>
-        <div className="min-h-screen bg-[#2c0a11] text-white font-sans">
-          <ToastContainer position="top-right" autoClose={3000} />
-          <Navbar />
-
-          <div className="px-4 py-8 max-w-4xl mx-auto">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/lock-info" element={<LockInfo />} />
-              <Route path="/submit-proof" element={<SubmitProof />} />
-              <Route path="/withdraw" element={<Withdraw />} />
-            </Routes>
-          </div>
-        </div>
-      </StarknetProvider>
-    </Router>
+    <StarknetProvider>
+      <div className="min-h-screen bg-[#0F172A] text-[#F8FAFC] font-sans">
+        <Navbar />
+        <main className="px-4 py-6 max-w-6xl mx-auto">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/lock" element={<LockAsset />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </main>
+      </div>
+    </StarknetProvider>
   );
 }
 
