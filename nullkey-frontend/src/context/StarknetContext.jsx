@@ -5,7 +5,7 @@ import {
   useCallback,
 } from "react";
 import { Contract } from "starknet";
-import { connect, disconnect } from "@starknet-io/get-starknet";
+import { connect, disconnect } from "@argent/get-starknet";
 import { NULLKEY_ABI, CONTRACT_ADDRESS } from "../utils/contract";
 
 const StarknetContext = createContext();
