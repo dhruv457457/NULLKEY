@@ -3,8 +3,8 @@ import { Routes, Route } from 'react-router-dom';
 import { StarknetProvider } from './context/StarknetContext';
 import Home from './pages/Home';
 import LockAsset from './pages/Lock';
-import Dashboard from './pages/Dashboard';
-import NotFound from './pages/NotFound';
+import Dashboard from './pages/Dash';
+import NotFound from './pages/Not';
 import Navbar from './components/Navbar';
 
 function App() {
