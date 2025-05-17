@@ -6,7 +6,7 @@ import {
 } from "react";
 import { Contract } from "starknet";
 import { connect, disconnect } from "@argent/get-starknet";
-import { NULLKEY_ABI, CONTRACT_ADDRESS } from "../utils/contract";
+import { NULLKEY_ABI, CONTRACT_ADDRESS } from "../utils/contr";
 
 const StarknetContext = createContext();
 export const useStarknet = () => useContext(StarknetContext);
