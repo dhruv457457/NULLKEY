@@ -1,6 +1,6 @@
 // src/components/LockCard.jsx
 import React from "react";
-import { shortAddress, formatU256 } from "../utils/format";
+import { shortAddress, formatU256 } from "../utils/forma";
 
 const LockC = ({ lock, lockId }) => {
   const isNFT = lock.asset_type === 0;
