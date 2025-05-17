@@ -1,7 +1,4 @@
-// ❌ Remove this line
-// import { BrowserRouter as Router } from "react-router-dom";
 
-// ✅ Just keep Routes and Route
 import { Routes, Route } from 'react-router-dom';
 import { StarknetProvider } from './context/StarknetContext';
 import Home from './pages/Home';
@@ -11,7 +8,7 @@ import NotFound from './pages/NotFound';
 import Navbar from './components/Navbar';
 
 function App() {
-  return (
+return (
     <StarknetProvider>
       <div className="min-h-screen bg-[#0F172A] text-[#F8FAFC] font-sans">
         <Navbar />
@@ -26,6 +23,6 @@ function App() {
       </div>
     </StarknetProvider>
   );
-}
+}  
 
 export default App;
