@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useStarknet } from "../context/StarknetContext";
 
-const WalletConnect = () => {
+const Wallet = () => {
   const { connectWallet, disconnectWallet, isConnected, account } = useStarknet();
   const [isConnecting, setIsConnecting] = useState(false);
   const [error, setError] = useState(null);
@@ -62,4 +62,4 @@ const WalletConnect = () => {
   );
 };
 
-export default WalletConnect;
+export default Wallet;

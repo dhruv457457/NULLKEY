@@ -1,7 +1,7 @@
 
-import UserLocks from "../components/UserLocks";
-import HeirClaims from "../components/HeirClaims";
-import ProofSubmit from "../components/ProofSubmit";
+import UserLocks from "../components/User";
+import HeirClaims from "../components/HeirClai";
+import ProofSubmit from "../components/ProofS";
 
 const Dash = () => {
   return (

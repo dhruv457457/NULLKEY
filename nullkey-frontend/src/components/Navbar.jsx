@@ -1,4 +1,4 @@
-import WalletConnect from "./WalletConnect";
+import WalletConnect from "./Wallet";
 import { Link } from "react-router-dom";
 
 const Navbar = () => {
