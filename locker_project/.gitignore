@@ -27,3 +27,21 @@ transaction_hash: 0x03a0d8e05f4af171a63ed8e46ef062d3be2f1bb0c3e349d83266f4448f82
 To see deployment details, visit:
 contract: https://sepolia.starkscan.co/contract/0x07538f0e5549eb9a8626fa77a018d7691c26c9600d28fb7fb273abf7ffceabcc
 transaction: https://sepolia.starkscan.co/tx/0x03a0d8e05f4af171a63ed8e46ef062d3be2f1bb0c3e349d83266f4448f8207c2
+
+
+
+
+
+
+
+mine@DESKTOP-1PK0M5Q:/mnt/c/Users/mine/Documents/GitHub/NULLKEY/locker_project$ starkli deploy   --keystore ./starkli-wallet/keystore.json   --account ./starkli-wallet/account.json   --watch 0x0173017d255f0889645d542d8a92f92f2ec8120aee2b582eaa7079302e6c8ae4
+WARNING: you're using neither --rpc (STARKNET_RPC) nor --network (STARKNET_NETWORK). The `sepolia` network is used by default. See https://book.starkli.rs/providers for more details.
+Enter keystore password:
+Deploying class 0x0173017d255f0889645d542d8a92f92f2ec8120aee2b582eaa7079302e6c8ae4 with salt 0x035b48b7cd220cbfee14d8a81ec28e0e583c0d67d0ebf0c7d3cfba9d4e2ec264...
+The contract will be deployed at address 0x0464de1a64702861cacac4586b4ef70a2cb425bc6af5df30f1c8fd7346e5c050
+Contract deployment transaction: 0x04aca0d00949929cd1a105c88000abbe5a7d867a643bf81ff18e36d405f434ed
+Waiting for transaction 0x04aca0d00949929cd1a105c88000abbe5a7d867a643bf81ff18e36d405f434ed to confirm...
+Transaction not confirmed yet...
+Transaction 0x04aca0d00949929cd1a105c88000abbe5a7d867a643bf81ff18e36d405f434ed confirmed
+Contract deployed:
+0x0464de1a64702861cacac4586b4ef70a2cb425bc6af5df30f1c8fd7346e5c050

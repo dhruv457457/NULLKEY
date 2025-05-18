@@ -125,7 +125,7 @@ mod NullKeyVault {
         let block = get_block_number();
         let dispatcher = IERC721Dispatcher { contract_address: nft };
         assert(dispatcher.is_approved_for_all(caller, get_contract_address()), 'Not approved');
-        
+
         dispatcher.transfer_from(caller, get_contract_address(), token_id);
 
         let lock = LockInfo {
@@ -210,10 +210,7 @@ mod NullKeyVault {
 
         let hashed = pedersen(proof, caller.into());
         if hashed == lock.commitment {
-            let updated_lock = LockInfo {
-                unlocked: true,
-                ..lock
-            };
+            let updated_lock = LockInfo { unlocked: true, ..lock };
             self.locks.write((caller, lock_id), updated_lock);
             self.emit(Event::Unlocked(Unlocked { user: caller, lock_id }));
         } else {
@@ -276,7 +273,7 @@ mod NullKeyVault {
     ) -> Array<LockInfo> {
         let mut arr: Array<LockInfo> = ArrayTrait::new();
         let count = self.user_lock_count.read(user);
-        
+
         let mut i = start;
         let end = if count < start + limit { count } else { start + limit };
         while i < end {
@@ -301,6 +298,12 @@ mod NullKeyVault {
             i += 1;
         }
         res
+    }
+
+    // ✅ NEW: Get total locks of a user
+    #[external(v0)]
+    fn get_lock_count(self: @ContractState, user: ContractAddress) -> u32 {
+        self.user_lock_count.read(user)
     }
 
     #[generate_trait]
