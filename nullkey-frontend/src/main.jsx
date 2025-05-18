@@ -1,3 +1,6 @@
+import { Buffer } from 'buffer';
+window.Buffer = Buffer;
+
 import { BrowserRouter } from "react-router-dom";
 import { createRoot } from "react-dom/client";
 import App from "./App";

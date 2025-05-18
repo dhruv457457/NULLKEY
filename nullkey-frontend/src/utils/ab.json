@@ -91,6 +91,41 @@
     "state_mutability": "external"
   },
   {
+    "type": "enum",
+    "name": "locker_project::AssetType",
+    "variants": [
+      { "name": "NFT", "type": "()" },
+      { "name": "Token", "type": "()" }
+    ]
+  },
+  {
+    "type": "enum",
+    "name": "core::bool",
+    "variants": [
+      { "name": "False", "type": "()" },
+      { "name": "True", "type": "()" }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "locker_project::LockInfo",
+    "members": [
+      { "name": "asset_type", "type": "locker_project::AssetType" },
+      { "name": "token_contract", "type": "core::starknet::contract_address::ContractAddress" },
+      { "name": "token_id", "type": "core::integer::u256" },
+      { "name": "amount", "type": "core::integer::u256" },
+      { "name": "commitment", "type": "core::felt252" },
+      { "name": "unlocked", "type": "core::bool" },
+      { "name": "failed_attempts", "type": "core::integer::u32" },
+      { "name": "last_attempt_block", "type": "core::integer::u64" },
+      { "name": "cooldown_blocks", "type": "core::integer::u64" },
+      { "name": "lock_block", "type": "core::integer::u64" },
+      { "name": "expiry_blocks", "type": "core::integer::u64" },
+      { "name": "heir", "type": "core::starknet::contract_address::ContractAddress" },
+      { "name": "deadman_blocks", "type": "core::integer::u64" }
+    ]
+  },
+  {
     "type": "function",
     "name": "get_user_locks_paginated",
     "inputs": [
@@ -110,10 +145,68 @@
       { "name": "heir", "type": "core::starknet::contract_address::ContractAddress" }
     ],
     "outputs": [
-      {
-        "type": "core::array::Array::<(core::starknet::contract_address::ContractAddress, core::integer::u32)>"
-      }
+      { "type": "core::array::Array::<(core::starknet::contract_address::ContractAddress, core::integer::u32)>" }
     ],
     "state_mutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "get_lock_count",
+    "inputs": [
+      { "name": "user", "type": "core::starknet::contract_address::ContractAddress" }
+    ],
+    "outputs": [
+      { "type": "core::integer::u32" }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "type": "event",
+    "name": "locker_project::NullKeyVault::Locked",
+    "kind": "struct",
+    "members": [
+      { "name": "user", "type": "core::starknet::contract_address::ContractAddress", "kind": "key" },
+      { "name": "lock_id", "type": "core::integer::u32", "kind": "key" },
+      { "name": "asset_type", "type": "core::integer::u8", "kind": "data" }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "locker_project::NullKeyVault::Unlocked",
+    "kind": "struct",
+    "members": [
+      { "name": "user", "type": "core::starknet::contract_address::ContractAddress", "kind": "key" },
+      { "name": "lock_id", "type": "core::integer::u32", "kind": "key" }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "locker_project::NullKeyVault::ExpiryExtended",
+    "kind": "struct",
+    "members": [
+      { "name": "user", "type": "core::starknet::contract_address::ContractAddress", "kind": "key" },
+      { "name": "lock_id", "type": "core::integer::u32", "kind": "key" },
+      { "name": "extra_blocks", "type": "core::integer::u64", "kind": "data" }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "locker_project::NullKeyVault::LockCancelled",
+    "kind": "struct",
+    "members": [
+      { "name": "user", "type": "core::starknet::contract_address::ContractAddress", "kind": "key" },
+      { "name": "lock_id", "type": "core::integer::u32", "kind": "key" }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "locker_project::NullKeyVault::Event",
+    "kind": "enum",
+    "variants": [
+      { "name": "Locked", "type": "locker_project::NullKeyVault::Locked", "kind": "nested" },
+      { "name": "Unlocked", "type": "locker_project::NullKeyVault::Unlocked", "kind": "nested" },
+      { "name": "ExpiryExtended", "type": "locker_project::NullKeyVault::ExpiryExtended", "kind": "nested" },
+      { "name": "LockCancelled", "type": "locker_project::NullKeyVault::LockCancelled", "kind": "nested" }
+    ]
   }
 ]

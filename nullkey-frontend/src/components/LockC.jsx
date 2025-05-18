@@ -1,13 +1,18 @@
 // src/components/LockCard.jsx
 import React from "react";
-import { shortAddress, formatU256 } from "../utils/forma";
+import { shortAddress, formatU256, toBigInt } from "../utils/forma";
 
 const LockC = ({ lock, lockId }) => {
-  const isNFT = lock.asset_type === 0;
+  const isNFT = lock.assetType === "NFT";
 
   const blockToMinutes = (blocks) => {
-    const secondsPerBlock = 3;
-    return Math.floor((+blocks * secondsPerBlock) / 60);
+    try {
+      const b = toBigInt(blocks);
+      const seconds = b * 3n;
+      return Number(seconds / 60n);
+    } catch {
+      return "N/A";
+    }
   };
 
   return (
@@ -24,13 +29,13 @@ const LockC = ({ lock, lockId }) => {
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         <div>
           <span className="text-gray-400">Token Contract:</span>
-          <div className="break-all">{shortAddress(lock.token_contract)}</div>
+          <div className="break-all">{shortAddress(lock.tokenContract)}</div>
         </div>
 
         {isNFT ? (
           <div>
             <span className="text-gray-400">Token ID:</span>
-            <div>{formatU256(lock.token_id)}</div>
+            <div>{formatU256(lock.tokenId)}</div>
           </div>
         ) : (
           <div>
@@ -46,26 +51,26 @@ const LockC = ({ lock, lockId }) => {
 
         <div>
           <span className="text-gray-400">Cooldown:</span>
-          <div>{blockToMinutes(lock.cooldown_blocks)} mins</div>
+          <div>{blockToMinutes(lock.cooldownBlocks)} mins</div>
         </div>
 
         <div>
           <span className="text-gray-400">Expiry:</span>
-          <div>{blockToMinutes(lock.expiry_blocks)} mins</div>
+          <div>{blockToMinutes(lock.expiryBlocks)} mins</div>
         </div>
 
         <div>
           <span className="text-gray-400">Deadman:</span>
-          <div>{blockToMinutes(lock.deadman_blocks)} mins</div>
+          <div>{blockToMinutes(lock.deadmanBlocks)} mins</div>
         </div>
       </div>
 
       <div className="flex justify-between items-center pt-2 border-t border-white/10">
         <div className="text-xs text-white/70">
-          Attempts: {+lock.failed_attempts}
+          Attempts: {+lock.failedAttempts}
         </div>
         <div className="text-xs text-white/70">
-          Lock Block: {+lock.lock_block}
+          Lock Block: {+lock.lockBlock}
         </div>
       </div>
     </div>

@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useStarknet } from "../context/StarknetContext";
-import { uint256, num, hash } from "starknet";
+import { Contract, uint256, shortString, hash } from "starknet";
+import { CONTRACT_ADDRESS, ERC721_ABI } from "../utils/contr";
 
-const secondsPerBlock = 3; // Approximate block time on Starknet
+const secondsPerBlock = 3;
 
 const Lock = () => {
-  const { account, contract, isConnected } = useStarknet();
+  const { account, contract, readContract, isConnected } = useStarknet();
   const [assetType, setAssetType] = useState("NFT");
 
   const [formData, setFormData] = useState({
@@ -20,6 +21,7 @@ const Lock = () => {
   });
 
   const [status, setStatus] = useState("");
+  const [lockIdCreated, setLockIdCreated] = useState(null);
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -28,13 +30,25 @@ const Lock = () => {
     }));
   };
 
+  const handleApprove = async () => {
+    try {
+      setStatus("🔄 Approving NFT...");
+      const nftContract = new Contract(ERC721_ABI, formData.contract, account);
+      await nftContract.set_approval_for_all(CONTRACT_ADDRESS, true);
+      setStatus("✅ Vault approved.");
+    } catch (err) {
+      console.error(err);
+      setStatus(`❌ Approval failed: ${err.message}`);
+    }
+  };
+
   const handleLock = async () => {
-    if (!isConnected || !account || !contract) {
-      setStatus("❌ Wallet not connected.");
+    if (!isConnected || !account || !contract || !readContract) {
+      setStatus("❌ Wallet not connected or contract not ready.");
       return;
     }
 
-    setStatus("🔄 Submitting...");
+    setStatus("🔄 Submitting lock transaction...");
 
     try {
       const {
@@ -48,14 +62,14 @@ const Lock = () => {
         deadmanMins,
       } = formData;
 
-      const commitment = hash.pedersen(
-        num.toFelt(secret),
-        num.toFelt(account.address)
-      );
+      const commitment = hash.computeHashOnElements([
+        shortString.encodeShortString(secret),
+        account.address,
+      ]);
 
-      const expiryBlocks = BigInt(Math.floor((+expiryMins * 60) / secondsPerBlock));
-      const cooldownBlocks = BigInt(Math.floor((+cooldownMins * 60) / secondsPerBlock));
-      const deadmanBlocks = BigInt(Math.floor((+deadmanMins * 60) / secondsPerBlock));
+      const expiryBlocks = BigInt((+expiryMins * 60) / secondsPerBlock);
+      const cooldownBlocks = BigInt((+cooldownMins * 60) / secondsPerBlock);
+      const deadmanBlocks = BigInt((+deadmanMins * 60) / secondsPerBlock);
 
       if (assetType === "NFT") {
         await contract.lock_nft(
@@ -79,27 +93,39 @@ const Lock = () => {
         );
       }
 
-      setStatus("✅ Asset locked successfully.");
+      // ✅ Correctly call get_lock_count with .method(...)
+      const countRes = await readContract.get_lock_count(account.address);
+      console.log("get_lock_count response:", countRes);
+
+      const rawCount =
+        typeof countRes === "object" ? Object.values(countRes)[0] : countRes;
+
+      const lockCount = parseInt(rawCount.toString(), 10);
+      if (isNaN(lockCount)) {
+        throw new Error("Unable to fetch lock count");
+      }
+
+      setLockIdCreated(lockCount - 1);
+      setStatus(`✅ Locked! Your Lock ID is ${lockCount - 1}`);
+
+      window.dispatchEvent(new Event("reloadLocks"));
     } catch (err) {
       console.error(err);
-      setStatus(`❌ Error: ${err.message}`);
+      setStatus(`❌ Lock failed: ${err.message}`);
     }
   };
 
   return (
-    <div className="max-w-2xl mx-auto py-10 px-4">
-      <h2 className="text-3xl font-bold mb-6 text-[#00FFFF]">Securely Lock Your Asset</h2>
+    <div className="max-w-2xl mx-auto p-6 text-white">
+      <h2 className="text-3xl font-bold text-[#00FFFF] mb-4">Lock Your Asset</h2>
 
-      {/* Asset Type Toggle */}
-      <div className="flex gap-4 mb-6">
+      <div className="flex gap-4 mb-4">
         {["NFT", "TOKEN"].map((type) => (
           <button
             key={type}
             onClick={() => setAssetType(type)}
-            className={`px-4 py-2 rounded-lg ${
-              assetType === type
-                ? "bg-[#00FFFF] text-black"
-                : "bg-white/10 text-white border border-white/20"
+            className={`px-4 py-2 rounded ${
+              assetType === type ? "bg-[#00FFFF] text-black" : "bg-gray-800"
             }`}
           >
             {type}
@@ -107,92 +133,88 @@ const Lock = () => {
         ))}
       </div>
 
-      {/* Form */}
-      <div className="grid gap-4 text-sm text-white">
+      <div className="grid gap-3">
         <input
+          className="input-style"
           name="contract"
-          placeholder="Token Contract Address"
+          placeholder="Token Contract"
           value={formData.contract}
           onChange={handleChange}
-          className="input-style"
         />
-
         {assetType === "NFT" ? (
           <input
+            className="input-style"
             name="tokenId"
             placeholder="Token ID"
-            type="number"
             value={formData.tokenId}
             onChange={handleChange}
-            className="input-style"
           />
         ) : (
           <input
+            className="input-style"
             name="amount"
-            placeholder="Token Amount"
-            type="number"
+            placeholder="Amount"
             value={formData.amount}
             onChange={handleChange}
-            className="input-style"
           />
         )}
-
-        <textarea
+        <input
+          className="input-style"
           name="secret"
-          placeholder="Secret (used for proof later)"
+          placeholder="Secret"
           value={formData.secret}
           onChange={handleChange}
-          className="input-style"
-          rows={3}
         />
-
         <input
+          className="input-style"
           name="expiryMins"
-          type="number"
-          placeholder="Expiry (in minutes)"
+          placeholder="Expiry (mins)"
           value={formData.expiryMins}
           onChange={handleChange}
-          className="input-style"
         />
-
         <input
+          className="input-style"
           name="cooldownMins"
-          type="number"
-          placeholder="Cooldown Period (in minutes)"
+          placeholder="Cooldown (mins)"
           value={formData.cooldownMins}
           onChange={handleChange}
-          className="input-style"
         />
-
         <input
+          className="input-style"
           name="heir"
-          placeholder="Heir Wallet Address"
+          placeholder="Heir Address"
           value={formData.heir}
           onChange={handleChange}
-          className="input-style"
         />
-
         <input
+          className="input-style"
           name="deadmanMins"
-          type="number"
-          placeholder="Deadman Timer (in minutes)"
+          placeholder="Deadman Timer (mins)"
           value={formData.deadmanMins}
           onChange={handleChange}
-          className="input-style"
         />
       </div>
 
-      {/* Submit */}
+      {assetType === "NFT" && (
+        <button
+          onClick={handleApprove}
+          className="mt-4 w-full bg-gray-700 py-2 rounded"
+        >
+          Approve Vault
+        </button>
+      )}
+
       <button
         onClick={handleLock}
-        className="mt-6 w-full bg-[#00FFFF] text-black font-semibold py-3 rounded-xl hover:scale-105 transition-all"
+        className="mt-2 w-full bg-[#00FFFF] text-black font-semibold py-2 rounded"
       >
         Lock {assetType}
       </button>
 
-      {status && (
-        <p className="mt-4 text-sm text-center text-white bg-white/10 px-4 py-2 rounded-lg">
-          {status}
+      {status && <p className="mt-4 bg-gray-800 p-2 rounded">{status}</p>}
+      {lockIdCreated !== null && (
+        <p className="mt-2 text-green-400">
+          Your Lock ID: <strong>{lockIdCreated}</strong>
         </p>
       )}
     </div>
